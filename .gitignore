@@ -1,0 +1,27 @@
+# Keil MDK-ARM 构建产物
+Objects/
+*.axf
+*.lnp
+*.htm
+*.build_log.htm
+*.d
+*.dep
+*.map
+
+# Keil 用户设置文件（个人配置，不应共享）
+*.uvguix.*
+# *.uvoptx  # 注释掉此行以保留烧录配置
+
+# J-Link 调试器文件
+JLinkLog.txt
+# JLinkSettings.ini  # 注释掉此行以保留调试器配置
+
+# 构建查看器日志
+keil-build-viewer-record.txt
+keil-build-viewer.log
+
+# SysConfig 生成的临时文件
+*.scvd
+
+# VS Code 设置（可选，根据团队需求决定）
+.vscode/
