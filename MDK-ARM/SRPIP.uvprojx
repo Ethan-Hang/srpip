@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Core/Inc;C:\ti\mspm0_sdk_2_05_01_00\source\third_party\CMSIS\Core\Include;C:\ti\mspm0_sdk_2_05_01_00\source;..\Middlewares\RTT</IncludePath>
+              <IncludePath>../;../Core/Inc;C:\ti\mspm0_sdk_2_05_01_00\source\third_party\CMSIS\Core\Include;C:\ti\mspm0_sdk_2_05_01_00\source;..\Middlewares\RTT;..\Middlewares\EasyLogger\inc;..\Driver\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -429,6 +429,41 @@
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Middlewares\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middlewares/EasyLog</GroupName>
+          <Files>
+            <File>
+              <FileName>elog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\EasyLogger\src\elog.c</FilePath>
+            </File>
+            <File>
+              <FileName>elog_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\EasyLogger\port\elog_port.c</FilePath>
+            </File>
+            <File>
+              <FileName>elog_utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\EasyLogger\src\elog_utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>elog_buf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\EasyLogger\src\elog_buf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Dirvers</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Driver\Src\bsp_delay.c</FilePath>
             </File>
           </Files>
         </Group>

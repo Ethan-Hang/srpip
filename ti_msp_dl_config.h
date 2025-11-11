@@ -102,18 +102,9 @@ extern "C" {
 /* Port definition for Pin Group GPIO_LEDS */
 #define GPIO_LEDS_PORT                                                   (GPIOB)
 
-/* Defines for USER_LED_1: GPIOB.22 with pinCMx 50 on package pin 21 */
-#define GPIO_LEDS_USER_LED_1_PIN                                (DL_GPIO_PIN_22)
-#define GPIO_LEDS_USER_LED_1_IOMUX                               (IOMUX_PINCM50)
-/* Defines for USER_LED_2: GPIOB.26 with pinCMx 57 on package pin 28 */
-#define GPIO_LEDS_USER_LED_2_PIN                                (DL_GPIO_PIN_26)
-#define GPIO_LEDS_USER_LED_2_IOMUX                               (IOMUX_PINCM57)
-/* Defines for USER_LED_3: GPIOB.27 with pinCMx 58 on package pin 29 */
-#define GPIO_LEDS_USER_LED_3_PIN                                (DL_GPIO_PIN_27)
-#define GPIO_LEDS_USER_LED_3_IOMUX                               (IOMUX_PINCM58)
-/* Defines for USER_TEST: GPIOB.16 with pinCMx 33 on package pin 4 */
-#define GPIO_LEDS_USER_TEST_PIN                                 (DL_GPIO_PIN_16)
-#define GPIO_LEDS_USER_TEST_IOMUX                                (IOMUX_PINCM33)
+/* Defines for USER_LED: GPIOB.22 with pinCMx 50 on package pin 21 */
+#define GPIO_LEDS_USER_LED_PIN                                  (DL_GPIO_PIN_22)
+#define GPIO_LEDS_USER_LED_IOMUX                                 (IOMUX_PINCM50)
 
 /* clang-format on */
 
