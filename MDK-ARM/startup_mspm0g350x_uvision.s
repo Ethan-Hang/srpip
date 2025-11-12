@@ -132,12 +132,13 @@ __Vectors_Size  EQU     __Vectors_End - __Vectors
 
 Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
-                ;IMPORT  SystemInit
-                IMPORT  __main
-				; SystemInit can be called here, but not necessary for MSPM0
-                ;LDR     R0, =SystemInit
-                ;BLX     R0
-                LDR     R0, =__main
+                IMPORT  __custom_data_init
+                IMPORT  main
+                ; 先调用自定义的数据初始化函数
+                LDR     R0, =__custom_data_init
+                BLX     R0
+                ; 然后跳转到 main
+                LDR     R0, =main
                 BX      R0
                 ENDP
 
