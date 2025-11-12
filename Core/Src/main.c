@@ -16,7 +16,7 @@
  *
  * call directly.
  *
- * @version V1.0 2025-11-11
+ * @version V1.0 2025-11-12
  *
  * @note 1 tab == 4 spaces!
  *
@@ -35,12 +35,24 @@
 
 //******************************** Defines **********************************//
 
-void app_elog_init(void);
+// Linker-generated symbols for RW_IRAM2 custom memory region
+// Load addresses (in Flash/ROM)
+extern int Load$$RW_IRAM2$$Base;
 
+// Execution addresses (in RAM) - RW data section
+extern int Image$$RW_IRAM2$$RW$$Base;
+extern int Image$$RW_IRAM2$$RW$$Limit;
+
+// Execution addresses (in RAM) - ZI data section (BSS)
+extern int Image$$RW_IRAM2$$ZI$$Base;
+extern int Image$$RW_IRAM2$$ZI$$Limit;
+
+void       app_elog_init(void);
+void       __custom_data_init(void);
 //******************************** Defines **********************************//
 
 //************************** Function Implementations ***********************//
-int  main(void)
+int        main(void)
 {
     SYSCFG_DL_init();
     BSP_Delay_Init(CPUCLK_FREQ);
@@ -48,19 +60,21 @@ int  main(void)
 
     while (1)
     {
-        log_i("Hello EasyLogger on MSPM0G3507!");
-        BSP_Delay_ms(1000);
         DL_GPIO_togglePins(GPIO_LEDS_PORT, GPIO_LEDS_USER_LED_PIN);
+        BSP_Delay_ms(1000);
     }
 }
 
-/******************************************************************
- *@brief  Retargets the C library printf function to the USART.
+/**
+ * @brief Retarget printf to SEGGER RTT
  *
- *@param  None
+ * Redirects standard output to SEGGER RTT for debugging.
  *
- *@retval None
- ******************************************************************/
+ * @param[in]  ch : Character to transmit
+ * @param[in]  f  : File pointer
+ *
+ * @retval The character written (ch)
+ */
 int fputc(int ch, FILE *f)
 {
     // DL_UART_transmitDataBlocking(UART_0_INST, (uint8_t)ch);
@@ -69,15 +83,18 @@ int fputc(int ch, FILE *f)
 }
 
 /**
- * @brief  Initialize EasyLogger module
+ * @brief Initialize EasyLogger module
  *
- * @param[in] :  None
+ * Initializes EasyLogger library for system logging.
  *
+ * @param[in]  : None
  * @param[out] : None
  *
  * @retval None
  *
- * */
+ * @note Must be called after __custom_data_init() to ensure all
+ *       global variables are properly initialized
+ */
 void app_elog_init(void)
 {
     elog_init();
@@ -88,4 +105,46 @@ void app_elog_init(void)
     elog_start();
 }
 
+/**
+ * @brief Custom data section initialization
+ *
+ * Called in Reset_Handler before main() to initialize RW_IRAM2
+ * custom memory region. Prevents global variable initialization
+ * failures in custom memory regions.
+ *
+ * @param[in]  : None
+ * @param[out] : None
+ *
+ * @retval None
+ *
+ * @note 1. Copy RW data from Flash to RAM
+ *       2. Zero-initialize ZI data (BSS)
+ *
+ * @warning Cannot use memcpy/memset. Must be called in startup
+ *          before C library initialization.
+ */
+void __custom_data_init(void)
+{
+    uint32_t *src = (uint32_t *)&Load$$RW_IRAM2$$Base;
+    uint32_t *dst = (uint32_t *)&Image$$RW_IRAM2$$RW$$Base;
+    uint32_t *end = (uint32_t *)&Image$$RW_IRAM2$$RW$$Limit;
+
+    // 1. Copy RW data section (initialized global/static variables)
+    while (dst < end)
+    {
+        *dst = *src;
+        dst++;
+        src++;
+    }
+
+    // 2. Zero-initialize ZI data section (BSS)
+    dst = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Base;
+    end = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Limit;
+
+    while (dst < end)
+    {
+        *dst = 0;
+        dst++;
+    }
+}
 //************************** Function Implementations ***********************//
