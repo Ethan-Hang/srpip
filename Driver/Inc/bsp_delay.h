@@ -7,16 +7,16 @@
  *
  * @author Ethan-Hang
  *
- * @brief BSP delay driver based on SysTick timer
+ * @brief BSP delay driver based on TIMERG0
  *
  * Processing flow:
  *
- * 1. Call BSP_Delay_Init() to initialize SysTick timer
+ * 1. Call BSP_Delay_Init() to initialize delay counter
  * 2. Use BSP_Delay_ms() for millisecond delays
  * 3. Use BSP_GetTick() to get system timestamp
  *
- * @version V1.0 2025-11-11
- *
+ * @version V2.0 2025-11-15
+ * @note Changed from SysTick to TIMERG0, uses 64-bit counter internally
  * @note 1 tab == 4 spaces!
  *
  *****************************************************************************/
@@ -35,17 +35,18 @@ extern "C" {
 //************************** Function Declarations **************************//
 
 /******************************************************************
- * @brief  Initialize delay driver based on SysTick timer
+ * @brief  Initialize delay driver based on TIMERG0
  *
- * @param[in] : sysclk_freq - System clock frequency in Hz (e.g., 32000000)
+ * @param[in] : sysclk_freq - System clock frequency (not used, for compatibility)
  *
  * @param[out] : None
  *
  * @retval None
  *
  * @note Must be called before using any delay functions
+ * @note TIMERG0 is configured in ti_msp_dl_config.c (SysConfig)
  ******************************************************************/
-void BSP_Delay_Init(uint32_t sysclk_freq);
+void bsp_delay_init(uint32_t sysclk_freq);
 
 /******************************************************************
  * @brief  Delay in milliseconds
@@ -58,7 +59,7 @@ void BSP_Delay_Init(uint32_t sysclk_freq);
  *
  * @note Uses WFI (Wait For Interrupt) for power saving
  ******************************************************************/
-void BSP_Delay_ms(uint32_t ms);
+void bsp_delay_ms(uint32_t ms);
 
 /******************************************************************
  * @brief  Delay in microseconds
@@ -71,7 +72,7 @@ void BSP_Delay_ms(uint32_t ms);
  *
  * @note Busy-wait delay, suitable for short precise delays
  ******************************************************************/
-void BSP_Delay_us(uint32_t us);
+void bsp_delay_us_block(uint32_t us);
 
 /******************************************************************
  * @brief  Get system tick count in milliseconds
@@ -82,22 +83,9 @@ void BSP_Delay_us(uint32_t us);
  *
  * @retval System tick count in milliseconds since initialization
  *
- * @note Overflows after approximately 49.7 days
+ * @note Uses 64-bit counter internally, returns uint32_t for compatibility
  ******************************************************************/
 uint32_t BSP_GetTick(void);
-
-/******************************************************************
- * @brief  Get system tick count in microseconds
- *
- * @param[in] : None
- *
- * @param[out] : None
- *
- * @retval System tick count in microseconds since initialization
- *
- * @note Lower precision, calculated from millisecond counter
- ******************************************************************/
-uint64_t BSP_GetTick_us(void);
 
 //************************** Function Declarations **************************//
 

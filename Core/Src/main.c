@@ -48,20 +48,21 @@ extern int Image$$RW_IRAM2$$ZI$$Base;
 extern int Image$$RW_IRAM2$$ZI$$Limit;
 
 void       app_elog_init(void);
-void       __custom_data_init(void);
 //******************************** Defines **********************************//
 
 //************************** Function Implementations ***********************//
 int        main(void)
 {
     SYSCFG_DL_init();
-    BSP_Delay_Init(CPUCLK_FREQ);
+    bsp_delay_init(CPUCLK_FREQ);
     app_elog_init();
 
+    uint32_t count = 0;
     while (1)
     {
+        log_i("get tick: %llu ms", BSP_GetTick());
         DL_GPIO_togglePins(GPIO_LEDS_PORT, GPIO_LEDS_USER_LED_PIN);
-        BSP_Delay_ms(1000);
+        bsp_delay_ms(500);
     }
 }
 
