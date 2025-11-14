@@ -134,10 +134,10 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  __custom_data_init
                 IMPORT  main
-                ; 先调用自定义的数据初始化函数
+                ; first call the custom data init function
                 LDR     R0, =__custom_data_init
                 BLX     R0
-                ; 然后跳转到 main
+                ; then jump to main
                 LDR     R0, =main
                 BX      R0
                 ENDP

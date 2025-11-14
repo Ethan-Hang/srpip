@@ -7,18 +7,18 @@
  *
  * @author Ethan-Hang
  *
- * @brief BSP delay driver implementation based on SysTick timer
+ * @brief BSP delay driver implementation based on TIMERG0
  *
  * Processing flow:
  *
- * SysTick generates 1ms periodic interrupt to increment tick counter.
+ * TIMERG0 generates 1ms periodic interrupt to increment tick counter.
  * Delay functions use this counter for accurate timing.
  *
- * @version V1.0 2025-11-11
- *
+ * @version V2.0 2025-11-15
+ * @note Changed from SysTick to TIMERG0, counter changed to uint64_t
  * @note 1 tab == 4 spaces!
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 //******************************** Includes *********************************//
 #include "bsp_delay.h"
@@ -27,13 +27,13 @@
 
 //******************************** Defines **********************************//
 /* Private variables */
-static volatile uint32_t g_systick_ms = 0;      /* Millisecond counter */
+static volatile uint64_t g_timer_ms = 0; /* Millisecond counter (64-bit) */
 //******************************** Defines **********************************//
 
 //************************** Function Implementations ***********************//
 
 /******************************************************************
- * @brief  SysTick interrupt handler (1ms period)
+ * @brief  TIMERG0 interrupt handler (1ms period)
  *
  * @param[in] : None
  *
@@ -41,31 +41,41 @@ static volatile uint32_t g_systick_ms = 0;      /* Millisecond counter */
  *
  * @retval None
  *
- * @note This ISR is called every 1ms by SysTick timer
+ * @note This ISR is called every 1ms by TIMERG0 (TIMER_Delay)
  ******************************************************************/
-void SysTick_Handler(void)
+void                     TIMER_Delay_INST_IRQHandler(void)
 {
-    g_systick_ms++;
+    switch (DL_TimerG_getPendingInterrupt(TIMER_Delay_INST))
+    {
+        case DL_TIMERG_IIDX_ZERO:
+            g_timer_ms++;
+            break;
+        default:
+            break;
+    }
 }
 
 /******************************************************************
- * @brief  Initialize delay driver based on SysTick timer
+ * @brief  Initialize delay driver based on TIMERG0
  *
- * @param[in] : sysclk_freq - System clock frequency in Hz (e.g., 32000000)
+ * @param[in] : sysclk_freq - System clock frequency (not used, for
+ *compatibility)
  *
  * @param[out] : None
  *
  * @retval None
  *
- * @note DL_SYSTICK_config() enables interrupt and starts timer automatically
+ * @note TIMERG0 is configured in ti_msp_dl_config.c (SysConfig generated)
+ *       This function only resets counter and enables NVIC interrupt
  ******************************************************************/
-void BSP_Delay_Init(uint32_t sysclk_freq)
+void bsp_delay_init(uint32_t sysclk_freq)
 {
-    g_systick_ms = 0;
-    
-    /* Configure SysTick to generate interrupt every 1ms */
-    /* DL_SYSTICK_config already enables interrupt and starts timer */
-    DL_SYSTICK_config(sysclk_freq / 1000);
+    (void)sysclk_freq; /* Unused - timer configured by SysConfig */
+
+    g_timer_ms = 0;
+
+    /* Enable TIMERG0 interrupt in NVIC */
+    NVIC_EnableIRQ(TIMER_Delay_INST_INT_IRQN);
 }
 
 /******************************************************************
@@ -79,14 +89,14 @@ void BSP_Delay_Init(uint32_t sysclk_freq)
  *
  * @note Uses WFI instruction to enter low-power mode during wait
  ******************************************************************/
-void BSP_Delay_ms(uint32_t ms)
+void bsp_delay_ms(uint32_t ms)
 {
-    uint32_t start = g_systick_ms;
-    
-    while ((g_systick_ms - start) < ms)
+    uint64_t start = g_timer_ms;
+
+    while ((g_timer_ms - start) < ms)
     {
         /* Wait for time to elapse */
-        __WFI();  /* Enter sleep mode to save power */
+        // __WFI(); /* Enter sleep mode to save power */
     }
 }
 
@@ -99,12 +109,12 @@ void BSP_Delay_ms(uint32_t ms)
  *
  * @retval None
  *
- * @note Busy-wait using CPU cycles. At 32MHz: 1us = 32 cycles
+ * @note Busy-wait using CPU cycles. At 80MHz: 1us = 80 cycles
  ******************************************************************/
-void BSP_Delay_us(uint32_t us)
+void bsp_delay_us_block(uint32_t us)
 {
     /* Use cycle-based delay for microsecond delays */
-    /* At 32MHz: 1us = 32 cycles */
+    /* At 80MHz: 1us = 80 cycles */
     delay_cycles(us * (CPUCLK_FREQ / 1000000));
 }
 
@@ -117,27 +127,11 @@ void BSP_Delay_us(uint32_t us)
  *
  * @retval System tick count in milliseconds since initialization
  *
- * @note Overflows after approximately 49.7 days (2^32 ms)
+ * @note With uint64_t, overflows after ~584 million years
  ******************************************************************/
 uint32_t BSP_GetTick(void)
 {
-    return g_systick_ms;
-}
-
-/******************************************************************
- * @brief  Get system tick count in microseconds
- *
- * @param[in] : None
- *
- * @param[out] : None
- *
- * @retval System tick count in microseconds since initialization
- *
- * @note Calculated from millisecond counter, lower precision
- ******************************************************************/
-uint64_t BSP_GetTick_us(void)
-{
-    return (uint64_t)g_systick_ms * 1000;
+    return (uint32_t)g_timer_ms; /* Cast to uint32 for compatibility */
 }
 
 //************************** Function Implementations ***********************//

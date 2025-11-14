@@ -74,13 +74,21 @@ extern "C" {
 
 
 
-#define CPUCLK_FREQ                                                     32000000
+#define CPUCLK_FREQ                                                     80000000
+
+
+
+/* Defines for TIMER_Delay */
+#define TIMER_Delay_INST                                                 (TIMG0)
+#define TIMER_Delay_INST_IRQHandler                             TIMG0_IRQHandler
+#define TIMER_Delay_INST_INT_IRQN                               (TIMG0_INT_IRQn)
+#define TIMER_Delay_INST_LOAD_VALUE                                     (39999U)
 
 
 
 /* Defines for UART_0 */
 #define UART_0_INST                                                        UART0
-#define UART_0_INST_FREQUENCY                                           32000000
+#define UART_0_INST_FREQUENCY                                           40000000
 #define UART_0_INST_IRQHandler                                  UART0_IRQHandler
 #define UART_0_INST_INT_IRQN                                      UART0_INT_IRQn
 #define GPIO_UART_0_RX_PORT                                                GPIOA
@@ -92,8 +100,8 @@ extern "C" {
 #define GPIO_UART_0_IOMUX_RX_FUNC                      IOMUX_PINCM22_PF_UART0_RX
 #define GPIO_UART_0_IOMUX_TX_FUNC                      IOMUX_PINCM21_PF_UART0_TX
 #define UART_0_BAUD_RATE                                                  (9600)
-#define UART_0_IBRD_32_MHZ_9600_BAUD                                       (208)
-#define UART_0_FBRD_32_MHZ_9600_BAUD                                        (21)
+#define UART_0_IBRD_40_MHZ_9600_BAUD                                       (260)
+#define UART_0_FBRD_40_MHZ_9600_BAUD                                        (27)
 
 
 
@@ -112,6 +120,7 @@ void SYSCFG_DL_init(void);
 void SYSCFG_DL_initPower(void);
 void SYSCFG_DL_GPIO_init(void);
 void SYSCFG_DL_SYSCTL_init(void);
+void SYSCFG_DL_TIMER_Delay_init(void);
 void SYSCFG_DL_UART_0_init(void);
 
 
