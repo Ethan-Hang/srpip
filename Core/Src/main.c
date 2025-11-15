@@ -39,24 +39,21 @@
 
 //******************************** Defines **********************************//
 
-// Linker-generated symbols for RW_IRAM2 custom memory region
-// Load addresses (in Flash/ROM)
-// extern int Load$$RW_IRAM2$$Base;
+//// Linker-generated symbols for RW_IRAM2 custom memory region
+//// Load addresses (in Flash/ROM)
+ extern int Load$$RW_IRAM2$$Base;
 
-// // Execution addresses (in RAM) - RW data section
-// extern int Image$$RW_IRAM2$$RW$$Base;
-// extern int Image$$RW_IRAM2$$RW$$Limit;
+ // Execution addresses (in RAM) - RW data section
+ extern int Image$$RW_IRAM2$$RW$$Base;
+ extern int Image$$RW_IRAM2$$RW$$Limit;
 
-// // Execution addresses (in RAM) - ZI data section (BSS)
-// extern int Image$$RW_IRAM2$$ZI$$Base;
-// extern int Image$$RW_IRAM2$$ZI$$Limit;
+ // Execution addresses (in RAM) - ZI data section (BSS)
+ extern int Image$$RW_IRAM2$$ZI$$Base;
+ extern int Image$$RW_IRAM2$$ZI$$Limit;
 
 /* Function declarations */
 void       app_elog_init(void);
-void       vLedTask(void *pvParameters);
-void       vTask1(void *pvParameters);
-void       vTask2(void *pvParameters);
-void       vTask3(void *pvParameters);
+void       FREERTOS_Init(void);
 //******************************** Defines **********************************//
 
 //************************** Function Implementations ***********************//
@@ -66,37 +63,8 @@ int        main(void)
     bsp_delay_init(CPUCLK_FREQ);
     app_elog_init();
 
-    /* 创建 LED 闪烁任务 */
-    xTaskCreate(vLedTask,              /* 任务函数 */
-                "LED",                 /* 任务名称 */
-                256,                   /* 栈大小(字) */
-                NULL,                  /* 任务参数 */
-                1,                     /* 任务优先级 */
-                NULL);                 /* 任务句柄 */
-
-    /* 创建任务1 */
-    xTaskCreate(vTask1,                /* 任务函数 */
-                "Task1",               /* 任务名称 */
-                256,                   /* 栈大小(字) */
-                NULL,                  /* 任务参数 */
-                2,                     /* 任务优先级 */
-                NULL);                 /* 任务句柄 */
-
-    /* 创建任务2 */
-    xTaskCreate(vTask2,                /* 任务函数 */
-                "Task2",               /* 任务名称 */
-                256,                   /* 栈大小(字) */
-                NULL,                  /* 任务参数 */
-                2,                     /* 任务优先级 */
-                NULL);                 /* 任务句柄 */
-
-    /* 创建任务3 */
-    xTaskCreate(vTask3,                /* 任务函数 */
-                "Task3",               /* 任务名称 */
-                256,                   /* 栈大小(字) */
-                NULL,                  /* 任务参数 */
-                2,                     /* 任务优先级 */
-                NULL);                 /* 任务句柄 */
+    /* 初始化 FreeRTOS 并创建任务 */
+    FREERTOS_Init();
 
     log_i("FreeRTOS Starting...");
 
@@ -106,7 +74,7 @@ int        main(void)
     /* 永远不会到达这里 */
     while (1)
     {
-        log_i("Error: Should never reach here!");
+        log_e("Error: Should never reach here!");
     }
 }
 
@@ -170,104 +138,28 @@ void app_elog_init(void)
  * @warning Cannot use memcpy/memset. Must be called in startup
  *          before C library initialization.
  */
-// void __custom_data_init(void)
-// {
-//     uint32_t *src = (uint32_t *)&Load$$RW_IRAM2$$Base;
-//     uint32_t *dst = (uint32_t *)&Image$$RW_IRAM2$$RW$$Base;
-//     uint32_t *end = (uint32_t *)&Image$$RW_IRAM2$$RW$$Limit;
+ void __custom_data_init(void)
+ {
+     uint32_t *src = (uint32_t *)&Load$$RW_IRAM2$$Base;
+     uint32_t *dst = (uint32_t *)&Image$$RW_IRAM2$$RW$$Base;
+     uint32_t *end = (uint32_t *)&Image$$RW_IRAM2$$RW$$Limit;
 
-//     // 1. Copy RW data section (initialized global/static variables)
-//     while (dst < end)
-//     {
-//         *dst = *src;
-//         dst++;
-//         src++;
-//     }
+     // 1. Copy RW data section (initialized global/static variables)
+     while (dst < end)
+     {
+         *dst = *src;
+         dst++;
+         src++;
+     }
 
-//     // 2. Zero-initialize ZI data section (BSS)
-//     dst = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Base;
-//     end = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Limit;
+     // 2. Zero-initialize ZI data section (BSS)
+     dst = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Base;
+     end = (uint32_t *)&Image$$RW_IRAM2$$ZI$$Limit;
 
-//     while (dst < end)
-//     {
-//         *dst = 0;
-//         dst++;
-//     }
-// }
+     while (dst < end)
+     {
+         *dst = 0;
+         dst++;
+     }
+ }
 //************************** Function Implementations ***********************//
-
-/**
- * @brief LED 闪烁任务
- *
- * @param[in]  pvParameters : 任务参数(未使用)
- *
- * @retval None
- */
-void vLedTask(void *pvParameters)
-{
-    (void)pvParameters;
-    uint32_t count = 0;
-
-    while (1)
-    {
-        DL_GPIO_togglePins(GPIO_LEDS_PORT, GPIO_LEDS_USER_LED_PIN);
-        log_i("LED Task running, count: %lu, tick: %lu", count++, xTaskGetTickCount());
-        
-        /* 延时 500ms */
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-
-/**
- * @brief 任务1 - 每隔1秒输出信息
- *
- * @param[in]  pvParameters : 任务参数(未使用)
- *
- * @retval None
- */
-void vTask1(void *pvParameters)
-{
-    (void)pvParameters;
-
-    while (1)
-    {
-        printf("Task1: Hello from Thread 1\r\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
-
-/**
- * @brief 任务2 - 每隔1.5秒输出信息
- *
- * @param[in]  pvParameters : 任务参数(未使用)
- *
- * @retval None
- */
-void vTask2(void *pvParameters)
-{
-    (void)pvParameters;
-
-    while (1)
-    {
-        printf("Task2: Hello from Thread 2\r\n");
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-
-/**
- * @brief 任务3 - 每隔2秒输出信息
- *
- * @param[in]  pvParameters : 任务参数(未使用)
- *
- * @retval None
- */
-void vTask3(void *pvParameters)
-{
-    (void)pvParameters;
-
-    while (1)
-    {
-        printf("Task3: Hello from Thread 3\r\n");
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}

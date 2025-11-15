@@ -35,6 +35,79 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
+
+/* Static memory for idle task */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+
+/* Static memory for timer task */
+#if (configUSE_TIMERS == 1)
+static StaticTask_t xTimerTaskTCBBuffer;
+static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
+#endif
+
+/**
+ * @brief Provide static memory for idle task
+ * 
+ * @note This function must be implemented when configSUPPORT_STATIC_ALLOCATION = 1
+ */
+void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
+                                   StackType_t **ppxIdleTaskStackBuffer,
+                                   uint32_t *pulIdleTaskStackSize)
+{
+    *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+    *ppxIdleTaskStackBuffer = &xIdleStack[0];
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+
+#if (configUSE_TIMERS == 1)
+/**
+ * @brief Provide static memory for timer service task
+ * 
+ * @note This function must be implemented when configSUPPORT_STATIC_ALLOCATION = 1 and configUSE_TIMERS = 1
+ */
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
+                                    StackType_t **ppxTimerTaskStackBuffer,
+                                    uint32_t *pulTimerTaskStackSize)
+{
+    *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
+    *ppxTimerTaskStackBuffer = &xTimerStack[0];
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+}
+#endif /* configUSE_TIMERS */
+
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+
+/**
+ * @brief Stack overflow hook function
+ */
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    (void)xTask;
+    (void)pcTaskName;
+    
+    /* Stack overflow! Enter infinite loop for debugging */
+    taskDISABLE_INTERRUPTS();
+    while(1)
+    {
+        /* Set breakpoint here for debugging */
+    }
+}
+
+/**
+ * @brief Malloc failed hook function
+ */
+void vApplicationMallocFailedHook(void)
+{
+    /* Memory allocation failed! Enter infinite loop for debugging */
+    taskDISABLE_INTERRUPTS();
+    while(1)
+    {
+        /* Set breakpoint here for debugging */
+    }
+}
+
 #if (configCHECK_FOR_STACK_OVERFLOW)
     /*
      *  ======== vApplicationStackOverflowHook ========
@@ -44,12 +117,12 @@
      *  provides its own hook function.
      */
     #if defined(__IAR_SYSTEMS_ICC__)
-__weak void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
+__weak void vApplicationStackOverflowHook_TI(TaskHandle_t pxTask, char *pcTaskName)
     #elif (defined(__TI_COMPILER_VERSION__))
-        #pragma WEAK(vApplicationStackOverflowHook)
-void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
+        #pragma WEAK(vApplicationStackOverflowHook_TI)
+void vApplicationStackOverflowHook_TI(TaskHandle_t pxTask, char *pcTaskName)
     #elif (defined(__GNUC__) || defined(__ti_version__))
-void __attribute__((weak)) vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
+void __attribute__((weak)) vApplicationStackOverflowHook_TI(TaskHandle_t pxTask, char *pcTaskName)
     #endif
 {
     /* default to spin upon stack overflow */

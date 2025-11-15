@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>../;../Core/Inc;C:\ti\mspm0_sdk_2_05_01_00\source\third_party\CMSIS\Core\Include;C:\ti\mspm0_sdk_2_05_01_00\source;..\Middlewares\RTT;..\Middlewares\EasyLogger\inc;..\Driver\Inc;C:\ti\mspm0_sdk_2_05_01_00\kernel\freertos\Source\include;C:\ti\mspm0_sdk_2_05_01_00\kernel\freertos\Source\portable\TI_ARM_CLANG\ARM_CM0</IncludePath>
+              <IncludePath>../;../Core/Inc;C:\ti\mspm0_sdk_2_05_01_00\source\third_party\CMSIS\Core\Include;C:\ti\mspm0_sdk_2_05_01_00\source;..\Middlewares\RTT;..\Middlewares\EasyLogger\inc;..\Driver\Inc;..\Middlewares\Third_Party\FreeRTOS\Source\include;..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM0;..\Drivers\delay\Inc;..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -416,60 +416,15 @@
               <FilePath>../ti_msp_dl_config.c</FilePath>
             </File>
             <File>
-              <FileName>FreeRTOSConfig.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Core\Inc\FreeRTOSConfig.h</FilePath>
-            </File>
-            <File>
-              <FileName>freertos_hooks.c</FileName>
+              <FileName>freertos.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\freertos_hooks.c</FilePath>
+              <FilePath>..\Core\Src\freertos.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Middlewares/FreeRTOS</GroupName>
           <Files>
-            <File>
-              <FileName>AppHooks_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\AppHooks_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>ClockP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\ClockP_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>DebugP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\DebugP_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>HwiPMSPM0_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\HwiPMSPM0_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>MutexP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\MutexP_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>SemaphoreP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\SemaphoreP_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>SystemP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\SystemP_freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>TaskP_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\TaskP_freertos.c</FilePath>
-            </File>
             <File>
               <FileName>croutine.c</FileName>
               <FileType>1</FileType>
@@ -511,14 +466,14 @@
               <FilePath>..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM0\port.c</FilePath>
             </File>
             <File>
-              <FileName>portmacro.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM0\portmacro.h</FilePath>
-            </File>
-            <File>
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>AppHooks_freertos.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FreeRTOS\dpl\AppHooks_freertos.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -568,7 +523,7 @@
             <File>
               <FileName>bsp_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Driver\Src\bsp_delay.c</FilePath>
+              <FilePath>..\Drivers\delay\Src\bsp_delay.c</FilePath>
             </File>
           </Files>
         </Group>
