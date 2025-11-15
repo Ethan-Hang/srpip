@@ -54,6 +54,9 @@
 /* Function declarations */
 void       app_elog_init(void);
 void       vLedTask(void *pvParameters);
+void       vTask1(void *pvParameters);
+void       vTask2(void *pvParameters);
+void       vTask3(void *pvParameters);
 //******************************** Defines **********************************//
 
 //************************** Function Implementations ***********************//
@@ -66,9 +69,33 @@ int        main(void)
     /* 创建 LED 闪烁任务 */
     xTaskCreate(vLedTask,              /* 任务函数 */
                 "LED",                 /* 任务名称 */
-                128,                   /* 栈大小(字) */
+                256,                   /* 栈大小(字) */
                 NULL,                  /* 任务参数 */
                 1,                     /* 任务优先级 */
+                NULL);                 /* 任务句柄 */
+
+    /* 创建任务1 */
+    xTaskCreate(vTask1,                /* 任务函数 */
+                "Task1",               /* 任务名称 */
+                256,                   /* 栈大小(字) */
+                NULL,                  /* 任务参数 */
+                2,                     /* 任务优先级 */
+                NULL);                 /* 任务句柄 */
+
+    /* 创建任务2 */
+    xTaskCreate(vTask2,                /* 任务函数 */
+                "Task2",               /* 任务名称 */
+                256,                   /* 栈大小(字) */
+                NULL,                  /* 任务参数 */
+                2,                     /* 任务优先级 */
+                NULL);                 /* 任务句柄 */
+
+    /* 创建任务3 */
+    xTaskCreate(vTask3,                /* 任务函数 */
+                "Task3",               /* 任务名称 */
+                256,                   /* 栈大小(字) */
+                NULL,                  /* 任务参数 */
+                2,                     /* 任务优先级 */
                 NULL);                 /* 任务句柄 */
 
     log_i("FreeRTOS Starting...");
@@ -95,8 +122,10 @@ int        main(void)
  */
 int fputc(int ch, FILE *f)
 {
+    vTaskSuspendAll();
     // DL_UART_transmitDataBlocking(UART_0_INST, (uint8_t)ch);
     SEGGER_RTT_printf(0, "%c", ch);
+    xTaskResumeAll();
     return ch;
 }
 
@@ -185,6 +214,60 @@ void vLedTask(void *pvParameters)
         log_i("LED Task running, count: %lu, tick: %lu", count++, xTaskGetTickCount());
         
         /* 延时 500ms */
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+/**
+ * @brief 任务1 - 每隔1秒输出信息
+ *
+ * @param[in]  pvParameters : 任务参数(未使用)
+ *
+ * @retval None
+ */
+void vTask1(void *pvParameters)
+{
+    (void)pvParameters;
+
+    while (1)
+    {
+        printf("Task1: Hello from Thread 1\r\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+/**
+ * @brief 任务2 - 每隔1.5秒输出信息
+ *
+ * @param[in]  pvParameters : 任务参数(未使用)
+ *
+ * @retval None
+ */
+void vTask2(void *pvParameters)
+{
+    (void)pvParameters;
+
+    while (1)
+    {
+        printf("Task2: Hello from Thread 2\r\n");
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+/**
+ * @brief 任务3 - 每隔2秒输出信息
+ *
+ * @param[in]  pvParameters : 任务参数(未使用)
+ *
+ * @retval None
+ */
+void vTask3(void *pvParameters)
+{
+    (void)pvParameters;
+
+    while (1)
+    {
+        printf("Task3: Hello from Thread 3\r\n");
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
