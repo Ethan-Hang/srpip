@@ -1,13 +1,30 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * File Name          : freertos.c
- * Description        : Code for freertos applications
- ******************************************************************************
+/******************************************************************************
+ * @file freertos.c
  *
- ******************************************************************************
- */
-/* USER CODE END Header */
+ * @par dependencies
+ * - <stdio.h>
+ * - "ti_msp_dl_config.h"
+ * - "FreeRTOS.h"
+ * - "task.h"
+ * - "elog.h"
+ *
+ * @author Ethan-Hang
+ *
+ * @brief FreeRTOS task initialization and implementation
+ *
+ * Processing flow:
+ * 1. FREERTOS_Init() creates all application tasks
+ * 2. vLedTask toggles LED and logs status every 100ms
+ * 3. vTask1/2/3 output periodic messages for testing
+ *
+ * @version V1.0 2025-11-15
+ *          - Initial FreeRTOS task implementation
+ *          - Created LED blinking task with logging
+ *          - Created three demo tasks for testing scheduler
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ *****************************************************************************/
 
 //******************************** Includes *********************************//
 #include <stdio.h>
@@ -66,37 +83,37 @@ void FREERTOS_Init(void)
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
-    /* 创建 LED 闪烁任务 */
-    xTaskCreate(vLedTask, /* 任务函数 */
-                "LED",    /* 任务名称 */
-                256,      /* 栈大小(字) */
-                NULL,     /* 任务参数 */
-                1,        /* 任务优先级 */
-                NULL);    /* 任务句柄 */
+    /* Create LED blinking task */
+    xTaskCreate(vLedTask, /* Task function */
+                "LED",    /* Task name */
+                256,      /* Stack size (words) */
+                NULL,     /* Task parameter */
+                1,        /* Task priority */
+                NULL);    /* Task handle */
 
-    /* 创建任务1 */
-    xTaskCreate(vTask1,  /* 任务函数 */
-                "Task1", /* 任务名称 */
-                256,     /* 栈大小(字) */
-                NULL,    /* 任务参数 */
-                2,       /* 任务优先级 */
-                NULL);   /* 任务句柄 */
+    /* Create Task1 */
+    xTaskCreate(vTask1,  /* Task function */
+                "Task1", /* Task name */
+                256,     /* Stack size (words) */
+                NULL,    /* Task parameter */
+                2,       /* Task priority */
+                NULL);   /* Task handle */
 
-    /* 创建任务2 */
-    xTaskCreate(vTask2,  /* 任务函数 */
-                "Task2", /* 任务名称 */
-                256,     /* 栈大小(字) */
-                NULL,    /* 任务参数 */
-                2,       /* 任务优先级 */
-                NULL);   /* 任务句柄 */
+    /* Create Task2 */
+    xTaskCreate(vTask2,  /* Task function */
+                "Task2", /* Task name */
+                256,     /* Stack size (words) */
+                NULL,    /* Task parameter */
+                2,       /* Task priority */
+                NULL);   /* Task handle */
 
-    /* 创建任务3 */
-    xTaskCreate(vTask3,  /* 任务函数 */
-                "Task3", /* 任务名称 */
-                256,     /* 栈大小(字) */
-                NULL,    /* 任务参数 */
-                2,       /* 任务优先级 */
-                NULL);   /* 任务句柄 */
+    /* Create Task3 */
+    xTaskCreate(vTask3,  /* Task function */
+                "Task3", /* Task name */
+                256,     /* Stack size (words) */
+                NULL,    /* Task parameter */
+                2,       /* Task priority */
+                NULL);   /* Task handle */
     /* USER CODE END RTOS_THREADS */
 
     /* USER CODE BEGIN RTOS_EVENTS */
@@ -117,9 +134,9 @@ void FREERTOS_Init(void)
 /* USER CODE BEGIN Application */
 
 /**
- * @brief LED 闪烁任务
+ * @brief LED blinking task
  *
- * @param[in]  pvParameters : 任务参数(未使用)
+ * @param[in]  pvParameters : Task parameter (unused)
  *
  * @retval None
  */
@@ -134,15 +151,15 @@ void vLedTask(void *pvParameters)
         log_i("LED Task running, count: %lu, tick: %lu", count++,
               xTaskGetTickCount());
 
-        /* 延时 500ms */
+        /* Delay 500ms */
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
 /**
- * @brief 任务1 - 每隔1秒输出信息
+ * @brief Task1 - Output message every 1 second
  *
- * @param[in]  pvParameters : 任务参数(未使用)
+ * @param[in]  pvParameters : Task parameter (unused)
  *
  * @retval None
  */
@@ -158,9 +175,9 @@ void vTask1(void *pvParameters)
 }
 
 /**
- * @brief 任务2 - 每隔1.5秒输出信息
+ * @brief Task2 - Output message every 1.5 seconds
  *
- * @param[in]  pvParameters : 任务参数(未使用)
+ * @param[in]  pvParameters : Task parameter (unused)
  *
  * @retval None
  */
@@ -176,9 +193,9 @@ void vTask2(void *pvParameters)
 }
 
 /**
- * @brief 任务3 - 每隔2秒输出信息
+ * @brief Task3 - Output message every 2 seconds
  *
- * @param[in]  pvParameters : 任务参数(未使用)
+ * @param[in]  pvParameters : Task parameter (unused)
  *
  * @retval None
  */

@@ -5,18 +5,24 @@
  * - <stdio.h>
  * - "ti_msp_dl_config.h"
  * - "bsp_delay.h"
+ * - "FreeRTOS.h"
+ * - "task.h"
  * - "Segger_RTT.h"
  * - "elog.h"
  *
  * @author Ethan-Hang
  *
- * @brief
+ * @brief Main application entry point for FreeRTOS-based embedded system
  *
  * Processing flow:
  *
- * call directly.
  *
- * @version V1.0 2025-11-12
+ * @version V2.0 2025-11-15
+ *          - Integrated FreeRTOS real-time operating system
+ *          - Added multi-task support with LED blinking and logging tasks
+ *          - Implemented EasyLogger for system-wide logging
+ *          - Added SEGGER RTT support for debugging output
+ *          - Implemented custom data section initialization for RW_IRAM2
  *
  * @note 1 tab == 4 spaces!
  *
@@ -26,15 +32,14 @@
 #include <stdio.h>
 
 #include "ti_msp_dl_config.h"
-
 #include "bsp_delay.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "Segger_RTT.h"
 #include "elog.h"
 
-/* FreeRTOS includes */
-#include "FreeRTOS.h"
-#include "task.h"
+
 //******************************** Includes *********************************//
 
 //******************************** Defines **********************************//
@@ -63,15 +68,15 @@ int        main(void)
     bsp_delay_init(CPUCLK_FREQ);
     app_elog_init();
 
-    /* 初始化 FreeRTOS 并创建任务 */
+    /* Initialize FreeRTOS and create tasks */
     FREERTOS_Init();
 
     log_i("FreeRTOS Starting...");
 
-    /* 启动调度器 */
+    /* Start the scheduler */
     vTaskStartScheduler();
 
-    /* 永远不会到达这里 */
+    /* We should never get here as control is now taken by the scheduler */
     while (1)
     {
         log_e("Error: Should never reach here!");
